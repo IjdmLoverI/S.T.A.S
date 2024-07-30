@@ -13,10 +13,15 @@ public class PLayerMovement : MonoBehaviour
     public Rigidbody2D rb;
 
     public bool isJumping;
+
+    private Animator anim;
+
+    private bool isFacingRight;
     // Start is called before the first frame update
     void Start()
     {
-        
+        isFacingRight=true;
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -31,6 +36,23 @@ public class PLayerMovement : MonoBehaviour
             rb.AddForce(new Vector2(rb.velocity.x, jump));
         }
 
+        if (Move != 0)
+        {
+            anim.SetBool("IsRuning", true);      
+        }
+        else
+        {
+            anim.SetBool("IsRuning", false);
+        }
+
+        if (isFacingRight && Move > 0)
+        {
+            Flip();
+        }
+        else if (isFacingRight && Move < 0)
+        {
+            Flip();      
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -39,6 +61,14 @@ public class PLayerMovement : MonoBehaviour
         {
             isJumping = false;
         }
+    }
+
+    public void Flip()
+    {
+        isFacingRight = !isFacingRight;
+        Vector3 localScale = transform.localScale;
+        localScale.x *= -1f;
+        transform.localScale = localScale;
     }
 
     private void OnCollisionExit2D(Collision2D collision)
