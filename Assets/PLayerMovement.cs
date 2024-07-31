@@ -21,6 +21,7 @@ public class PLayerMovement : MonoBehaviour
     void Start()
     {
         isFacingRight=true;
+        isJumping = false;
         anim = GetComponent<Animator>();
     }
 
@@ -45,14 +46,23 @@ public class PLayerMovement : MonoBehaviour
             anim.SetBool("IsRuning", false);
         }
 
-        if (isFacingRight && Move > 0)
+        if (jump != 0)
+        {
+            anim.SetBool("IsJumping", true);
+        }
+        else 
+        {
+            anim.SetBool("IsJumping", false);
+        }
+
+        if (isFacingRight && Move < 0)
         {
             Flip();
         }
-        else if (isFacingRight && Move < 0)
-        {
-            Flip();      
-        }
+        else if (!isFacingRight && Move > 0)
+            {
+            Flip();
+            }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -61,6 +71,7 @@ public class PLayerMovement : MonoBehaviour
         {
             isJumping = false;
         }
+
     }
 
     public void Flip()
