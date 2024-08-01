@@ -16,7 +16,7 @@ public class ParalaxBG : MonoBehaviour
     {
         
         Vector3 deltaMovement = cameraTransform.position - lastCameraPosition;
-        transform.position += (deltaMovement * paralaxEffectMult)/60;
+        transform.position += (deltaMovement * paralaxEffectMult)/10;
         lastCameraPosition = cameraTransform.position;
     }
 

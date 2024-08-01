@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public class PLayerMovement : MonoBehaviour
@@ -13,9 +14,12 @@ public class PLayerMovement : MonoBehaviour
 
     public Rigidbody2D rb;
 
-    public bool isJumping;
+    bool grounded;
 
     private Animator anim;
+
+   // public Transform groundCheck;
+    // public float groundRadius;
 
     private bool isFacingRight;
     // Start is called before the first frame update
@@ -29,11 +33,12 @@ public class PLayerMovement : MonoBehaviour
     void Update()
     {
         Move = Input.GetAxisRaw("Horizontal");
-        rb.velocity = new Vector2(speed * Move, rb.velocity.y);
+        rb.velocity = new Vector2(speed * Move * Time.deltaTime, rb.velocity.y);
 
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && grounded)
         {
             rb.AddForce(new Vector2(rb.velocity.x, jump));
+            grounded = false;
         }
 
         if (Move != 0)
@@ -45,7 +50,7 @@ public class PLayerMovement : MonoBehaviour
             anim.SetBool("IsRuning", false);
         }
 
-        anim.SetBool("IsJumping", isJumping);
+        anim.SetBool("IsJumping", !grounded);
 
         if (isFacingRight && Move < 0)
         {
@@ -57,15 +62,25 @@ public class PLayerMovement : MonoBehaviour
             }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D other)
     {
-        if (collision.gameObject.CompareTag("Floor"))
+        if (other.gameObject.CompareTag("Ground"))
         {
-            isJumping = false;
+            Vector3 normal = other.GetContact(0).normal;
+            if (normal == Vector3.up)
+            {
+                grounded = true;
+            }
         }
 
     }
-
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            grounded = false;
+        }
+    }
     public void Flip()
     {
         isFacingRight = !isFacingRight;
@@ -74,11 +89,9 @@ public class PLayerMovement : MonoBehaviour
         transform.localScale = localScale;
     }
 
-    private void OnCollisionExit2D(Collision2D collision)
+    private void FixedUpdate()
     {
-        if (collision.gameObject.CompareTag("Floor"))
-        { 
-            isJumping = true;
-        }
+        rb.velocity = new Vector2(Move * speed * Time.deltaTime, rb.velocity.y);
     }
+
 }
