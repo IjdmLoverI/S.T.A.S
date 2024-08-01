@@ -6,6 +6,7 @@ public class PLayerMovement : MonoBehaviour
 {
 
     public float speed;
+
     public float jump;
 
     private float Move;
@@ -21,18 +22,16 @@ public class PLayerMovement : MonoBehaviour
     void Start()
     {
         isFacingRight=true;
-        isJumping = false;
         anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Move = Input.GetAxis("Horizontal");
-
+        Move = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(speed * Move, rb.velocity.y);
 
-        if (Input.GetButtonDown("Jump") && isJumping == false)
+        if (Input.GetButtonDown("Jump"))
         {
             rb.AddForce(new Vector2(rb.velocity.x, jump));
         }
@@ -46,14 +45,7 @@ public class PLayerMovement : MonoBehaviour
             anim.SetBool("IsRuning", false);
         }
 
-        if (jump != 0)
-        {
-            anim.SetBool("IsJumping", true);
-        }
-        else 
-        {
-            anim.SetBool("IsJumping", false);
-        }
+        anim.SetBool("IsJumping", isJumping);
 
         if (isFacingRight && Move < 0)
         {
