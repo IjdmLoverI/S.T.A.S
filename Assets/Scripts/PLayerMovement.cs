@@ -18,6 +18,15 @@ public class PLayerMovement : MonoBehaviour
 
     private Animator anim;
 
+    private bool canDash = true;
+    private bool isDashing;
+    public float dashingPower;
+    private float dashingTime = 0.3f;
+    private float dashingCooldown = 1f;
+
+    [SerializeField] private TrailRenderer tr;
+    
+
    // public Transform groundCheck;
     // public float groundRadius;
 
@@ -32,6 +41,12 @@ public class PLayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       
+        if (isDashing)
+        {
+            return;
+        }
+
         Move = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(speed * Move * Time.deltaTime, rb.velocity.y);
 
@@ -39,6 +54,11 @@ public class PLayerMovement : MonoBehaviour
         {
             rb.AddForce(new Vector2(rb.velocity.x, jump));
             grounded = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
+        {
+            StartCoroutine(Dash());
         }
 
         if (Move != 0)
@@ -92,6 +112,25 @@ public class PLayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         rb.velocity = new Vector2(Move * speed * Time.deltaTime, rb.velocity.y);
+        if (isDashing)
+        {
+            return;
+        }
     }
 
+    private IEnumerator Dash()
+    {
+        canDash = false;
+        isDashing = true;
+        float originalGravity = rb.gravityScale;
+        rb.gravityScale = 0f;
+        rb.velocity = new Vector2(rb.velocity.x * dashingPower, 0f);
+        tr.emitting = true;
+        yield return new WaitForSeconds(dashingTime);
+        tr.emitting = false;
+        rb.gravityScale = originalGravity;
+        isDashing = false;
+        yield return new WaitForSeconds(dashingCooldown);
+        canDash= true;
+    }
 }
